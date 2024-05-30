@@ -10,14 +10,25 @@ public class CongestionTaxCalculator
          * @return - the total congestion tax for that day
          */
 
-    public int GetTax(Vehicle vehicle, DateTime[] dates)
+    private IVehicle _vehicle;
+    public CongestionTaxCalculator(IVehicle vehicle)
     {
+        _vehicle = vehicle;
+    }
+
+
+    public int GetTax(DateTime[] dates)
+    {
+
+        if (_vehicle.IsExempt) return 0;
+
         DateTime intervalStart = dates[0];
         int totalFee = 0;
         foreach (DateTime date in dates)
         {
-            int nextFee = GetTollFee(date, vehicle);
-            int tempFee = GetTollFee(intervalStart, vehicle);
+            if (IsTollFreeDate(dates[0])) continue;
+            int nextFee = GetTollFee(date);
+            int tempFee = GetTollFee(intervalStart);
 
             long diffInMillies = date.Millisecond - intervalStart.Millisecond;
             long minutes = diffInMillies / 1000 / 60;
@@ -37,21 +48,8 @@ public class CongestionTaxCalculator
         return totalFee;
     }
 
-    private bool IsTollFreeVehicle(Vehicle vehicle)
+    public int GetTollFee(DateTime date)
     {
-        if (vehicle == null) return false;
-        String vehicleType = vehicle.GetVehicleType();
-        return vehicleType.Equals(TollFreeVehicles.Motorcycle.ToString()) ||
-               vehicleType.Equals(TollFreeVehicles.Tractor.ToString()) ||
-               vehicleType.Equals(TollFreeVehicles.Emergency.ToString()) ||
-               vehicleType.Equals(TollFreeVehicles.Diplomat.ToString()) ||
-               vehicleType.Equals(TollFreeVehicles.Foreign.ToString()) ||
-               vehicleType.Equals(TollFreeVehicles.Military.ToString());
-    }
-
-    public int GetTollFee(DateTime date, Vehicle vehicle)
-    {
-        if (IsTollFreeDate(date) || IsTollFreeVehicle(vehicle)) return 0;
 
         int hour = date.Hour;
         int minute = date.Minute;
