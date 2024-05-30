@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using congestion.calculator;
 public class CongestionTaxCalculator
@@ -19,38 +20,50 @@ public class CongestionTaxCalculator
     }
 
 
-    public int GetTax(DateTime[] dates)
+    public int GetTax(List<DateTime> dates)
     {
-
         if (_vehicle.IsExempt) return 0;
 
-        DateTime intervalStart = dates[0];
+        var distincedLogsByDates = GetDistincedLogsByDates(dates);
         int totalFee = 0;
-        foreach (DateTime date in dates)
+
+        foreach (var item in distincedLogsByDates)
         {
-            if (IsTollFreeDate(dates[0])) continue;
-            int nextFee = GetTollFee(TimeOnly.FromDateTime(date));
-            int tempFee = GetTollFee(TimeOnly.FromDateTime(intervalStart));
+            if (IsTollFreeDate(item.Key)) continue;
 
-            long diffInMillies = date.Millisecond - intervalStart.Millisecond;
-            long minutes = diffInMillies / 1000 / 60;
-
-            if (minutes <= 60)
-            {
-                if (totalFee > 0) totalFee -= tempFee;
-                if (nextFee >= tempFee) tempFee = nextFee;
-                totalFee += tempFee;
-            }
-            else
-            {
-                totalFee += nextFee;
-            }
+            totalFee += CalculateDailyTax(item.Value);
         }
-        if (totalFee > 60) totalFee = 60;
+
         return totalFee;
     }
 
-    public int CalculateDailyTax(List<TimeOnly> logs)
+    private Dictionary<DateOnly, List<TimeOnly>> GetDistincedLogsByDates(List<DateTime> logs)
+    {
+        logs=logs.OrderBy(l => l).ToList();
+        var distincedLogsByDates = new Dictionary<DateOnly, List<TimeOnly>>();
+        var oneDaylogs = new List<TimeOnly>();
+        oneDaylogs.Add(TimeOnly.FromDateTime(logs[0]));
+
+        for (int i = 1; i < logs.Count; i++)
+        {
+            if (logs[i].Date == logs[i - 1].Date)
+            {
+                oneDaylogs.Add(TimeOnly.FromDateTime(logs[i]));
+            }
+            else
+            {
+                distincedLogsByDates.Add(DateOnly.FromDateTime(logs[i - 1]), oneDaylogs);
+                oneDaylogs = new List<TimeOnly>();
+                oneDaylogs.Add(TimeOnly.FromDateTime(logs[i]));
+            }
+        }
+
+        distincedLogsByDates.Add(DateOnly.FromDateTime(logs[logs.Count - 1]), oneDaylogs);
+
+        return distincedLogsByDates;
+    }
+
+    private int CalculateDailyTax(List<TimeOnly> logs)
     {
         List<int> taxes = GetTaxesForEachLogApplyingHoursCongestionRule(logs);
 
@@ -73,6 +86,7 @@ public class CongestionTaxCalculator
 
     private int GetTaxApplyingSingleChargeRule(List<int> taxes, List<TimeOnly> logs)
     {
+        logs = logs.OrderBy(l => l).ToList();
         int totalTax = 0;
         TimeOnly endRange = logs[0].AddHours(1);
         int appliableTax = taxes[0];
@@ -101,7 +115,7 @@ public class CongestionTaxCalculator
         return Math.Min(calculatedTax, MaxTaxValuePerDay);
     }
 
-    public int GetTollFee(TimeOnly time)
+    private int GetTollFee(TimeOnly time)
     {
         int hour = time.Hour;
         int minute = time.Minute;
@@ -120,7 +134,7 @@ public class CongestionTaxCalculator
         else return 0;
     }
 
-    private Boolean IsTollFreeDate(DateTime date)
+    private Boolean IsTollFreeDate(DateOnly date)
     {
         int year = date.Year;
         int month = date.Month;
