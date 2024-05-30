@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using congestion.calculator;
 public class CongestionTaxCalculator
 {
@@ -9,8 +11,8 @@ public class CongestionTaxCalculator
          * @param dates   - date and time of all passes on one day
          * @return - the total congestion tax for that day
          */
-
-    private IVehicle _vehicle;
+    private const int MaxTaxValuePerDay = 60;
+    private readonly IVehicle _vehicle;
     public CongestionTaxCalculator(IVehicle vehicle)
     {
         _vehicle = vehicle;
@@ -27,8 +29,8 @@ public class CongestionTaxCalculator
         foreach (DateTime date in dates)
         {
             if (IsTollFreeDate(dates[0])) continue;
-            int nextFee = GetTollFee(date);
-            int tempFee = GetTollFee(intervalStart);
+            int nextFee = GetTollFee(TimeOnly.FromDateTime(date));
+            int tempFee = GetTollFee(TimeOnly.FromDateTime(intervalStart));
 
             long diffInMillies = date.Millisecond - intervalStart.Millisecond;
             long minutes = diffInMillies / 1000 / 60;
@@ -48,11 +50,62 @@ public class CongestionTaxCalculator
         return totalFee;
     }
 
-    public int GetTollFee(DateTime date)
+    public int CalculateDailyTax(List<TimeOnly> logs)
+    {
+        List<int> taxes = GetTaxesForEachLogApplyingHoursCongestionRule(logs);
+
+        int totalTax = GetTaxApplyingSingleChargeRule(taxes, logs);
+
+        return GetTaxApplyingMaxTaxPerDayRule(totalTax);
+    }
+
+    private List<int> GetTaxesForEachLogApplyingHoursCongestionRule(List<TimeOnly> oneDayLogs)
+    {
+        List<int> taxes = new List<int>();
+
+        oneDayLogs.ForEach(l =>
+        {
+            taxes.Add(GetTollFee(l));
+        });
+
+        return taxes;
+    }
+
+    private int GetTaxApplyingSingleChargeRule(List<int> taxes, List<TimeOnly> logs)
+    {
+        int totalTax = 0;
+        TimeOnly endRange = logs[0].AddHours(1);
+        int appliableTax = taxes[0];
+
+        for (int i = 1; i < logs.Count; i++)
+        {
+            if (logs[i] <= endRange)
+            {
+                appliableTax = Math.Max(taxes[i], appliableTax);
+            }
+            else
+            {
+                endRange = logs[i].AddHours(1);
+                totalTax += appliableTax;
+                appliableTax = taxes[i];
+            }
+        }
+
+        totalTax += appliableTax;
+
+        return totalTax;
+    }
+
+    private int GetTaxApplyingMaxTaxPerDayRule(int calculatedTax)
+    {
+        return Math.Min(calculatedTax, MaxTaxValuePerDay);
+    }
+
+    public int GetTollFee(TimeOnly time)
     {
 
-        int hour = date.Hour;
-        int minute = date.Minute;
+        int hour = time.Hour;
+        int minute = time.Minute;
 
         if (hour == 6 && minute >= 0 && minute <= 29) return 8;
         else if (hour == 6 && minute >= 30 && minute <= 59) return 13;
