@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace congestion.calculator
 {
-    public class Motorbike : IVehicle
+    public class Motorcycle : IVehicle
     {
         public bool IsExempt => true;
     }
