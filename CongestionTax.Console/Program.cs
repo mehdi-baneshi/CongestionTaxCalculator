@@ -4,7 +4,7 @@ using CongestionTax.Domain.Contracts.Vehicle;
 using CongestionTax.Domain.Models.Vehicle;
 using CongestionTaxRules;
 
-Console.WriteLine("Hello, World!");
+Console.WriteLine("Calculating total congestion tax:");
 
 IVehicle car = new Car();
 ICityCongestionTaxRule gothenburg = new GothenburgCongestionTaxRule();
