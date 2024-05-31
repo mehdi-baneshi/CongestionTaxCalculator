@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CongestionTaxRules
 {
-    internal class GothenburgCongestionTaxRule : ICityCongestionTaxRule
+    public class GothenburgCongestionTaxRule : ICityCongestionTaxRule
     {
         private const int MaxTaxValuePerDay = 60;
         private const int SingleChargeRulePeriodMins = 60;

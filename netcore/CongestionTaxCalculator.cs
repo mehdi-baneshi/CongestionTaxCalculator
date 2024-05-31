@@ -16,7 +16,7 @@ public class CongestionTaxCalculator
         _cityCongestionTaxRule = cityCongestionTaxRule;
     }
 
-    public int GetTax(List<DateTime> dates)
+    public int GetTotalTax(List<DateTime> dates)
     {
         if (_vehicle.IsExempt) return 0;
 
