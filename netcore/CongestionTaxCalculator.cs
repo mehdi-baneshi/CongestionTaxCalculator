@@ -13,6 +13,7 @@ public class CongestionTaxCalculator
          * @return - the total congestion tax for that day
          */
     private const int MaxTaxValuePerDay = 60;
+    private const int SingleChargeRulePeriodMins = 60;
     private readonly IVehicle _vehicle;
     public CongestionTaxCalculator(IVehicle vehicle)
     {
@@ -35,6 +36,15 @@ public class CongestionTaxCalculator
         }
 
         return totalFee;
+    }
+
+    private int CalculateDailyTax(List<TimeOnly> logs)
+    {
+        List<int> taxes = GetTaxesForEachLogApplyingHoursCongestionRule(logs);
+
+        int totalTax = GetTaxApplyingSingleChargeRule(taxes, logs);
+
+        return GetTaxApplyingMaxTaxPerDayRule(totalTax);
     }
 
     private Dictionary<DateOnly, List<TimeOnly>> GetDistincedLogsByDates(List<DateTime> logs)
@@ -63,15 +73,6 @@ public class CongestionTaxCalculator
         return distincedLogsByDates;
     }
 
-    private int CalculateDailyTax(List<TimeOnly> logs)
-    {
-        List<int> taxes = GetTaxesForEachLogApplyingHoursCongestionRule(logs);
-
-        int totalTax = GetTaxApplyingSingleChargeRule(taxes, logs);
-
-        return GetTaxApplyingMaxTaxPerDayRule(totalTax);
-    }
-
     private List<int> GetTaxesForEachLogApplyingHoursCongestionRule(List<TimeOnly> oneDayLogs)
     {
         List<int> taxes = new List<int>();
@@ -88,7 +89,7 @@ public class CongestionTaxCalculator
     {
         logs = logs.OrderBy(l => l).ToList();
         int totalTax = 0;
-        TimeOnly endRange = logs[0].AddHours(1);
+        TimeOnly endRange = logs[0].AddMinutes(SingleChargeRulePeriodMins);
         int appliableTax = taxes[0];
 
         for (int i = 1; i < logs.Count; i++)
@@ -99,7 +100,7 @@ public class CongestionTaxCalculator
             }
             else
             {
-                endRange = logs[i].AddHours(1);
+                endRange = logs[i].AddMinutes(SingleChargeRulePeriodMins);
                 totalTax += appliableTax;
                 appliableTax = taxes[i];
             }
