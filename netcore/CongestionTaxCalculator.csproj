@@ -6,4 +6,8 @@
     <RootNamespace>congestion.calculator</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CongestionTaxRules\CongestionTaxRules.csproj" />
+  </ItemGroup>
+
 </Project>
