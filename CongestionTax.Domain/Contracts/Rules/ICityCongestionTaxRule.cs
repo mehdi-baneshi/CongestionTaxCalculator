@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CongestionTaxRules
+namespace CongestionTax.Domain.Contracts.Rules
 {
     public interface ICityCongestionTaxRule
     {

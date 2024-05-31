@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace congestion.calculator
+namespace CongestionTax.Domain.Contracts.Vehicle
 {
     public interface IVehicle
     {

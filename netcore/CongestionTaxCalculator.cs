@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using congestion.calculator;
+using CongestionTax.Domain.Contracts.Rules;
+using CongestionTax.Domain.Contracts.Vehicle;
 using CongestionTaxRules;
 public class CongestionTaxCalculator
 {

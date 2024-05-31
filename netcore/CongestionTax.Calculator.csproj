@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CongestionTaxRules\CongestionTaxRules.csproj" />
+    <ProjectReference Include="..\CongestionTaxRules\CongestionTax.Rules.csproj" />
   </ItemGroup>
 
 </Project>
