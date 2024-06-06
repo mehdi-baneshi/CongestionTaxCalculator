@@ -5,11 +5,13 @@ VisualStudioVersion = 17.9.34714.143
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CongestionTax.Calculator", "netcore\CongestionTax.Calculator.csproj", "{C92326F8-0F98-4E23-AE1F-8F3C1408C106}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CongestionTax.Rules", "CongestionTaxRules\CongestionTax.Rules.csproj", "{0F813B7F-2539-4BFC-B52A-F11DD72BA60C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CongestionTax.Rules", "CongestionTaxRules\CongestionTax.Rules.csproj", "{0F813B7F-2539-4BFC-B52A-F11DD72BA60C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CongestionTax.Domain", "CongestionTax.Domain\CongestionTax.Domain.csproj", "{9D39313B-E188-4DA1-9548-9DFF4364024B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CongestionTax.Domain", "CongestionTax.Domain\CongestionTax.Domain.csproj", "{9D39313B-E188-4DA1-9548-9DFF4364024B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CongestionTax.Console", "CongestionTax.Console\CongestionTax.Console.csproj", "{1E62A6B5-B489-4FD1-BB0F-7B017FD8B518}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CongestionTax.Console", "CongestionTax.Console\CongestionTax.Console.csproj", "{1E62A6B5-B489-4FD1-BB0F-7B017FD8B518}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CongestionTax.DataAccess", "CongestionTax.DataAccess\CongestionTax.DataAccess.csproj", "{62C5E049-ED34-49AD-AF92-CD81788FA5F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{1E62A6B5-B489-4FD1-BB0F-7B017FD8B518}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E62A6B5-B489-4FD1-BB0F-7B017FD8B518}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E62A6B5-B489-4FD1-BB0F-7B017FD8B518}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62C5E049-ED34-49AD-AF92-CD81788FA5F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62C5E049-ED34-49AD-AF92-CD81788FA5F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62C5E049-ED34-49AD-AF92-CD81788FA5F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62C5E049-ED34-49AD-AF92-CD81788FA5F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

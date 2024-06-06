@@ -1,13 +1,23 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using CongestionTax.DataAccess;
+using CongestionTax.DataAccess.Repositories;
 using CongestionTax.Domain.Contracts.Rules;
 using CongestionTax.Domain.Contracts.Vehicle;
+using CongestionTax.Domain.DbContext;
 using CongestionTax.Domain.Models.Vehicle;
+using CongestionTax.Domain.Repositories;
 using CongestionTaxRules;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 Console.WriteLine("Calculating total congestion tax:");
 
+var context = new CongestionTaxDbContext();
+context.Database.Migrate();
 IVehicle car = new Car();
-ICityCongestionTaxRule gothenburg = new GothenburgCongestionTaxRule();
+IPublicHolidayRepository publicHolidayRepository = new PublicHolidayRepository(context);
+ITimelyTollFeeRepository timelyTollFeeRepository = new TimelyTollFeeRepository(context);
+ICityCongestionTaxRule gothenburg = new GothenburgCongestionTaxRule(publicHolidayRepository, timelyTollFeeRepository);
 
 List<DateTime> logs = new List<DateTime>();
 logs.Add(new DateTime(2013, 1, 14, 21, 10, 0));

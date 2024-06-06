@@ -1,4 +1,5 @@
 ﻿using CongestionTax.Domain.Contracts.Rules;
+using CongestionTax.Domain.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,15 @@ namespace CongestionTaxRules
     {
         private const int MaxTaxValuePerDay = 60;
         private const int SingleChargeRulePeriodMins = 60;
+        private const int GothenburgCityCode = 1001;
+        private readonly IPublicHolidayRepository _publicHolidayRepository;
+        private readonly ITimelyTollFeeRepository _timelyTollFeeRepository;
+
+        public GothenburgCongestionTaxRule(IPublicHolidayRepository publicHolidayRepository, ITimelyTollFeeRepository timelyTollFeeRepository)
+        {
+            _publicHolidayRepository= publicHolidayRepository;
+            _timelyTollFeeRepository= timelyTollFeeRepository;
+        }
 
         public int GetTaxApplyingMaxTaxPerDayRule(int calculatedTax)
         {
@@ -57,47 +67,20 @@ namespace CongestionTaxRules
 
         private int GetTollFee(TimeOnly time)
         {
-            int hour = time.Hour;
-            int minute = time.Minute;
-
-            if (hour == 6 && minute <= 29) return 8;
-            else if (hour == 6 && minute >= 30) return 13;
-            else if (hour == 7) return 18;
-            else if (hour == 8 && minute <= 29) return 13;
-            else if (hour == 8 && minute >= 30) return 8;
-            else if (hour >= 9 && hour <= 14) return 8;
-            else if (hour == 15 && minute <= 29) return 13;
-            else if (hour == 15 && minute >= 30) return 18;
-            else if (hour == 16) return 18;
-            else if (hour == 17) return 13;
-            else if (hour == 18 && minute <= 29) return 8;
-            else return 0;
+            return _timelyTollFeeRepository.GetTollFee(time, GothenburgCityCode);
         }
 
         public bool IsTollFreeDate(DateOnly date)
         {
-            int year = date.Year;
-            int month = date.Month;
-            int day = date.Day;
-
             if (date.Month == 7) return true;
 
             if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) return true;
 
-            if (year == 2013)
+            if (date.Year==2013)
             {
-                if (month == 1 && day == 1 ||
-                    month == 3 && (day == 28 || day == 29 || day == 31) ||
-                    month == 4 && (day == 1 || day == 30) ||
-                    month == 5 && (day == 1 || day == 8 || day == 9) ||
-                    month == 6 && (day == 5 || day == 6 || day == 20 || day == 21) ||
-                    month == 10 && day == 31 ||
-                    month == 11 && day == 1 ||
-                    month == 12 && (day == 24 || day == 25 || day == 26 || day == 31))
-                {
-                    return true;
-                }
+                return _publicHolidayRepository.IsPublicHoliday(date) || _publicHolidayRepository.IsPublicHoliday(date.AddDays(1));
             }
+
             return false;
         }
     }
